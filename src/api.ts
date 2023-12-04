@@ -7,68 +7,54 @@ const options = {
   },
 };
 
-
-interface Item {
-    title: string;
-    backdrop_path: string;
-	_id: string;
-}
-
 // Get movies
-try {
-  fetch(url, options)
-    .then((response) => response.json())
-    .then((data) => {
-      // all movies
-      // console.log(data)
-      const results = data.movies;
 
-      const movieCardsContainer = document.querySelector(".movie-cards") as HTMLInputElement;
+fetch(url, options)
+  .then((response) => response.json())
+  .then(({ movies }: Data) => {
+    // all movies
+    // console.log(data)
+    const results = movies || [];
 
-      results.map((item:Item) => {
-        const movieName:string = item.title;
-        const img:string = item.backdrop_path;
-        const movieId:string = item._id;
+    const movieCardsContainer = document.querySelector(".movie-cards") as HTMLInputElement;
 
-        const movieCard = document.createElement("li");
-        movieCard.innerHTML = `
+    results.map(({ title: movieName, backdrop_path: img, _id: movieId }) => {
+      const movieCard = document.createElement("li");
+      movieCard.innerHTML = `
                 <img src="${img}" alt="${movieName}">
                 <h2>${movieName}</h2>
                 `;
 
-        const detailsButton = document.createElement("button");
-        detailsButton.innerText = "Details";
-        detailsButton.addEventListener("click", function () {
-          //console.log('Clicked on Details button for movieId:', movieId);
-          openModal(movieId);
-        });
-
-        movieCard.appendChild(detailsButton);
-        movieCardsContainer.appendChild(movieCard);
+      const detailsButton = document.createElement("button");
+      detailsButton.innerText = "Details";
+      detailsButton.addEventListener("click", () => {
+        openModal(movieId);
       });
+
+      movieCard.appendChild(detailsButton);
+      movieCardsContainer.appendChild(movieCard);
     });
-} catch (error) {
-  //console.error(error);
-}
+  }).catch(console.error);
+
 
 // Home btn from Navbar refresh the page
 const homeLink = document.getElementById("home-link") as HTMLInputElement;
-homeLink.addEventListener("click", function () {
-  location.reload();
-});
+homeLink.addEventListener("click", () => { location.reload(); });
 
 // Details
 function closeModal() {
   //console.log('closeModal function called');
-  const modal = document.getElementById("movieModal") as HTMLInputElement;
-  modal.style.display = "none";
+  const modal = document.getElementById("movieModal");
+  if (modal)
+    modal.style.display = "none";
 
-  const main = document.querySelector(".main-content") as HTMLInputElement;
-  main.classList.remove("modal-open");
+  const main = document.querySelector(".main-content");
+  if (main)
+    main.classList.remove("modal-open");
 }
 
-function openModal(movieId:string) {
-  const modal = document.getElementById("movieModal")as HTMLInputElement;
+function openModal(movieId: string) {
+  const modal = document.getElementById("movieModal") as HTMLInputElement;
   const modalTitle = document.querySelector(".modal-title") as HTMLInputElement;
   const modalImg = document.querySelector(".modal-img") as HTMLInputElement;
   const modalDescription = document.querySelector(".description") as HTMLInputElement;
@@ -78,9 +64,9 @@ function openModal(movieId:string) {
 
   fetch(detailsUrl, options)
     .then((response) => {
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`Network response was not ok: ${response.status}`);
-      }
+
       return response.json();
     })
     .then((movieDetails) => {
@@ -96,33 +82,21 @@ function openModal(movieId:string) {
 
       modal.style.display = "block";
 
-      const main = document.querySelector(".main-content") as HTMLElement;
-      main.classList.add("modal-open");
+      const main = document.querySelector(".main-content");
+      main?.classList.add("modal-open");
     })
     .catch((error) => {
       console.error("Error fetching movie details:", error);
     });
 }
 
-document.addEventListener("click", function (event) {
-  const clickedItem = event.target;
+document.addEventListener("click", ({ target: clickedItem }) => {
+
   console.log("eventTarget", clickedItem);
 
-  const targetOuterdiv = document.querySelector(".modal") as HTMLElement;
-  const targetTitle = document.querySelector(".modal-title") as HTMLElement;
-  const targetImg = document.querySelector(".modal-img") as HTMLElement;
-  const targetModalContent = document.querySelector(".modal-content") as HTMLElement;
-  const targetDescription = document.querySelector(".description") as HTMLElement;
-  const targetYear = document.querySelector(".year") as HTMLElement;
+  const doClose = [".modal", ".modal-title", ".modal-img", ".modal-content", ".description", ".year"]
+    .every(selector => document.querySelector(selector) !== clickedItem);
 
-  if (
-    clickedItem !== targetOuterdiv &&
-    clickedItem !== targetTitle &&
-    clickedItem !== targetImg &&
-    clickedItem !== targetModalContent &&
-    clickedItem !== targetDescription &&
-    clickedItem !== targetYear
-  ) {
+  if (doClose)
     closeModal();
-  }
 });

@@ -8,49 +8,40 @@ const options = {
     },
 };
 // Get movies
-try {
-    fetch(url, options)
-        .then((response) => response.json())
-        .then((data) => {
-        // all movies
-        // console.log(data)
-        const results = data.movies;
-        const movieCardsContainer = document.querySelector(".movie-cards");
-        results.map((item) => {
-            const movieName = item.title;
-            const img = item.backdrop_path;
-            const movieId = item._id;
-            const movieCard = document.createElement("li");
-            movieCard.innerHTML = `
+fetch(url, options)
+    .then((response) => response.json())
+    .then(({ movies }) => {
+    // all movies
+    // console.log(data)
+    const results = movies || [];
+    const movieCardsContainer = document.querySelector(".movie-cards");
+    results.map(({ title: movieName, backdrop_path: img, _id: movieId }) => {
+        const movieCard = document.createElement("li");
+        movieCard.innerHTML = `
                 <img src="${img}" alt="${movieName}">
                 <h2>${movieName}</h2>
                 `;
-            const detailsButton = document.createElement("button");
-            detailsButton.innerText = "Details";
-            detailsButton.addEventListener("click", function () {
-                //console.log('Clicked on Details button for movieId:', movieId);
-                openModal(movieId);
-            });
-            movieCard.appendChild(detailsButton);
-            movieCardsContainer.appendChild(movieCard);
+        const detailsButton = document.createElement("button");
+        detailsButton.innerText = "Details";
+        detailsButton.addEventListener("click", () => {
+            openModal(movieId);
         });
+        movieCard.appendChild(detailsButton);
+        movieCardsContainer.appendChild(movieCard);
     });
-}
-catch (error) {
-    //console.error(error);
-}
+}).catch(console.error);
 // Home btn from Navbar refresh the page
 const homeLink = document.getElementById("home-link");
-homeLink.addEventListener("click", function () {
-    location.reload();
-});
+homeLink.addEventListener("click", () => { location.reload(); });
 // Details
 function closeModal() {
     //console.log('closeModal function called');
     const modal = document.getElementById("movieModal");
-    modal.style.display = "none";
+    if (modal)
+        modal.style.display = "none";
     const main = document.querySelector(".main-content");
-    main.classList.remove("modal-open");
+    if (main)
+        main.classList.remove("modal-open");
 }
 function openModal(movieId) {
     const modal = document.getElementById("movieModal");
@@ -77,27 +68,16 @@ function openModal(movieId) {
         modalYear.innerText = year;
         modal.style.display = "block";
         const main = document.querySelector(".main-content");
-        main.classList.add("modal-open");
+        main === null || main === void 0 ? void 0 : main.classList.add("modal-open");
     })
         .catch((error) => {
         console.error("Error fetching movie details:", error);
     });
 }
-document.addEventListener("click", function (event) {
-    const clickedItem = event.target;
+document.addEventListener("click", ({ target: clickedItem }) => {
     console.log("eventTarget", clickedItem);
-    const targetOuterdiv = document.querySelector(".modal");
-    const targetTitle = document.querySelector(".modal-title");
-    const targetImg = document.querySelector(".modal-img");
-    const targetModalContent = document.querySelector(".modal-content");
-    const targetDescription = document.querySelector(".description");
-    const targetYear = document.querySelector(".year");
-    if (clickedItem !== targetOuterdiv &&
-        clickedItem !== targetTitle &&
-        clickedItem !== targetImg &&
-        clickedItem !== targetModalContent &&
-        clickedItem !== targetDescription &&
-        clickedItem !== targetYear) {
+    const doClose = [".modal", ".modal-title", ".modal-img", ".modal-content", ".description", ".year"]
+        .every(selector => document.querySelector(selector) !== clickedItem);
+    if (doClose)
         closeModal();
-    }
 });
