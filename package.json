@@ -1,0 +1,13 @@
+{
+  "name": "movie_api_imdb_ts",
+  "version": "1.0.0",
+  "description": "Movie_API_IMDB_JS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node api.js",
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
