@@ -40,4 +40,4 @@ sql
 npm start
 
 Explore the API:
-Open your web browser and go to http://localhost:3000 to explore the API documentation and test different endpoints.
+Open your web browser and go to http://localhost:5500 to explore the API documentation and test different endpoints.
