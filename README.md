@@ -11,7 +11,7 @@ To get started with the Movie API IMDB, follow these steps:
 
     bash
 
-git clone https://github.com/your-username/Movie_API_IMDB_ТS.git
+git clone https://github.com/NikolayDimov/Movie_API_IMDB_ТS.git
 
 Navigate to the Project Directory:
 
